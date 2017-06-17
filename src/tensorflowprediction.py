@@ -2,12 +2,13 @@ import sys
 import tensorflow as tf
 import numpy as np
 import model_cache as cache
+import labels
 
-def predict(model_name, image_path):
+def predict(modeldetails, image_path):
     # Load the image, models and the lables
-    graph_def = load_graph(model_name)
+    graph_def = load_graph(modeldetails)
     image_data = tf.gfile.FastGFile(image_path, 'rb').read()
-    label_lines = load_labels(model_name)
+    labels = load_labels(modeldetails)
 
     reset_graph()
 
@@ -30,7 +31,7 @@ def predict(model_name, image_path):
         
         classify_result = []
         for node_id in top_k:
-            human_string = label_lines[node_id]
+            human_string = labels[node_id]
             score = predictions[0][node_id]
             result = {
                 'label':human_string,
@@ -47,22 +48,22 @@ def predict(model_name, image_path):
 def reset_graph():
     tf.reset_default_graph()
 
-def load_graph(model_id):
-    cached_model = cache.get(model_id)
+def load_graph(modeldetails):
+    cached_model = cache.get(modeldetails.id)
     if cached_model == None:
         # Unpersists graph from file
-        with tf.gfile.FastGFile("inference/" + model_id + "/graph.pb", 'rb') as f:
+        with tf.gfile.FastGFile(modeldetails.path + "/graph.pb", 'rb') as f:
             print 'Loading graph from file'
             graph_def = tf.GraphDef()
             graph_def.ParseFromString(f.read())
-            cache.put(model_id, graph_def)
+            cache.put(modeldetails.id, graph_def)
             return graph_def
     else:
         print 'Loading graph from cache'
         return cached_model;
 
-def load_labels(model_id):
-  return [line.rstrip() for line in tf.gfile.GFile("inference/" + model_id + "/labels.txt")]
+def load_labels(modeldetails):
+    labels.load(modeldetails.path + '/labels.txt')
 
 if __name__ == '__main__':
     print("model:" + sys.argv[1])

@@ -43,8 +43,8 @@ def load_mean(path):
   blob.ParseFromString(data)
   return np.array( caffe.io.blobproto_to_array(blob) )[0]
 
-def load_labels(name):
-  labels.load(name)
+def load_labels(path):
+  labels.load(path + '/labels.txt')
 
 if __name__ == "__main__":
   img_path1 = './data/apple/bad/thumb_IMG_0573_1024.jpg'

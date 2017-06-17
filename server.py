@@ -2,7 +2,7 @@
 
 from flask import Flask
 from flask import abort
-from flask import request
+from flask import request, jsonify
 
 from src import caffeprediction as caffeprediction
 from src import tensorflowprediction as tensorflowprediction
@@ -32,7 +32,8 @@ def predict():
 		return abort(400, {'message': 'Missing argument: path'})
 
 	details = fetch_model_details(model)
-
+	details.validate()
+	
 	if details.provider == 'caffe':
 		result = caffeprediction.predict(modeldetails, filename)
 	elif details.provider == 'tensorflow':
@@ -40,7 +41,7 @@ def predict():
 	else:
 		return abort(400, {'message': 'Missing argument: path'})
 
-	return json.dumps( result )
+	return jsonify(result)
 
 def fetch_model_details(modelid):
 	response = urllib2.urlopen("http://localhost:9080/api/modeldetails/" + modelid)

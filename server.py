@@ -14,6 +14,7 @@ import datetime
 import werkzeug
 import sys
 import urllib2
+from timeit import default_timer as timer
 
 app = Flask(__name__)
 
@@ -23,6 +24,7 @@ def ping():
 
 @app.route('/api/predict')
 def predict():
+	start = timer()
 	model = request.args.get('model')
 	filename = request.args.get('path')
 	
@@ -35,12 +37,16 @@ def predict():
 	details.validate()
 	
 	if details.provider == 'caffe':
-		result = caffeprediction.predict(modeldetails, filename)
+		result = caffeprediction.predict(details, filename)
 	elif details.provider == 'tensorflow':
-		result = tensorflowprediction.predict(modeldetails, filename)
+		result = tensorflowprediction.predict(details, filename)
 	else:
-		return abort(400, {'message': 'Missing argument: path'})
+		return abort(400, {'message': 'Invalid provider:' + details.provider})
 
+	end = timer()
+	elapsed = (end - start)
+	print('elapsed time: ' + str(elapsed))
+	result['elapsed'] = elapsed
 	return jsonify(result)
 
 def fetch_model_details(modelid):
@@ -56,6 +62,7 @@ def fetch_model_details(modelid):
 	)
 
 if __name__ == "__main__":
+	# /Users/marcusnilsson/VBoxShared/test/prediction-service/data/apple/bad/thumb_IMG_0557_1024.jpg
 	# content = fetch_model_details("caffe")
 	modeldetails = fetch_model_details("f92f738e-5f6c-46e1-8e3b-2eddaaafbc7a")
 	print(modeldetails.provider)

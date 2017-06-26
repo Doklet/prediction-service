@@ -9,6 +9,7 @@ def load(labelfile):
   return labels
 
 if __name__ == "__main__":
-    filename = '../data/labels.txt'
+    filename = '/var/lib/skyraid/models/1/33c066e5-c713-4a1b-83dd-d298b11d3cef/v1/labels.txt'
+    # filename = '../data/labels.txt'
     labels = load(filename)
     print(labels)

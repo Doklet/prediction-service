@@ -8,7 +8,7 @@ def predict(modeldetails, image_path):
     # Load the image, models and the lables
     graph_def = load_graph(modeldetails)
     image_data = tf.gfile.FastGFile(image_path, 'rb').read()
-    labels = load_labels(modeldetails)
+    labellist = load_labels(modeldetails)
 
     reset_graph()
 
@@ -31,7 +31,7 @@ def predict(modeldetails, image_path):
         
         classify_result = []
         for node_id in top_k:
-            human_string = labels[node_id]
+            human_string = labellist[node_id]
             score = predictions[0][node_id]
             result = {
                 'label':human_string,
@@ -41,7 +41,7 @@ def predict(modeldetails, image_path):
             print result
         
         return {
-            'model':model_name,
+            'model':modeldetails.id,
             'labels':classify_result
             }
 
@@ -63,7 +63,7 @@ def load_graph(modeldetails):
         return cached_model;
 
 def load_labels(modeldetails):
-    labels.load(modeldetails.path + '/labels.txt')
+    return labels.load(modeldetails.path + '/labels.txt')
 
 if __name__ == '__main__':
     print("model:" + sys.argv[1])

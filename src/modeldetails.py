@@ -10,3 +10,6 @@ class ModelDetails(object):
   def validate(self):
   	if self.path == None or self.path == 'undefined':
   		raise Exception('The path of the model is invalid: ' + self.path)
+
+  def __str__(self):
+    return str(self.__class__) + ": " + str(self.__dict__)

@@ -7,6 +7,7 @@ import model_cache as cache
 import labels
 from timeit import default_timer as timer
 
+caffe.set_device(0)
 caffe.set_mode_gpu()
 
 def predict(modeldetails, img_path):
